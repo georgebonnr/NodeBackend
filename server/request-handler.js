@@ -5,6 +5,7 @@
  * node module documentation at http://nodejs.org/api/modules.html. */
 
 var url = require("url");
+var storage = require("./storage");
 
 var handleRequest = function(request, response) {
   console.log(request.method);
@@ -12,9 +13,9 @@ var handleRequest = function(request, response) {
   var pathname = url.parse(request.url).pathname;
   var headers = defaultCorsHeaders;
   console.log("Request for " + pathname + " received.");
-  headers['Content-Type'] = "application/javascript";
+  headers['Content-Type'] = "text/plain";
   response.writeHead(statusCode, headers);
-  response.end('_testcb(\'{"message": "HI THERE WORLD!"}\')');
+  response.end('hi there!');
 };
 
 var defaultCorsHeaders = {

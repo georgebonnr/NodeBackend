@@ -3,15 +3,14 @@
 var getData =  function() {
   $.ajax({
     // always use this url
-    url: 'http://127.0.0.1:8080',
-    dataType: 'jsonP',
-    jsonpCallback: "_testcb",
+    url: 'http://127.0.0.1:8080/classes/chatterbox',
+    // dataType: 'json',
     type: 'GET',
-    // data: {
-    //   order: "-createdAt"
-    // },
+    data: {
+      order: "-createdAt"
+    },
     success: function (data) {
-      console.log(data)
+      console.log(data);
       render(data.results);
     },
     error: function (data) {
@@ -77,10 +76,8 @@ var sendData = function(data) {
   data = JSON.stringify(data);
   $.ajax({
     url: 'http://127.0.0.1:8080',
-    dataType: 'jsonP',
-    jsonpCallback: "_testcb",
+    // dataType: 'json',
     type: 'POST',
-    contentType: 'application/json',
     data: data,
     success: function (data) {
       console.log('chatterbox: Message sent');

@@ -1,7 +1,6 @@
 {
   "name": "chatterbox",
-  "version": "0.0.0",
-  "componentsDirectory": "client/",
+  "version": "0.0.1",
   "dependencies": {
     "jquery": "~2.0.3",
     "underscore": "~1.5.2"
