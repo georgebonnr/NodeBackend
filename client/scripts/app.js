@@ -6,9 +6,10 @@ var getData =  function() {
     url: 'http://127.0.0.1:8080/classes/chatterbox',
     dataType: 'json',
     type: 'GET',
-    // data: {
-    //   order: "-createdAt"
-    // },
+    data: {
+      order: "-createdAt",
+      room: window.currentRoom
+    },
     success: function (data) {
       console.log(data);
       render(data);
@@ -21,36 +22,56 @@ var getData =  function() {
 
 var render = function (data) {
   // console.log(data)
-  window.rooms = {};
-  _(data).each(function (datum) {
-    if (rooms[datum.roomname] === undefined) {
-      window.rooms[datum.roomname] = [datum];
-    } else {
-      window.rooms[datum.roomname].push(datum);
-    }
-  });
+  // window.rooms = {};
+  // _(data).each(function (datum) {
+  //   if (rooms[datum.roomname] === undefined) {
+  //     window.rooms[datum.roomname] = [datum];
+  //   } else {
+  //     window.rooms[datum.roomname].push(datum);
+  //   }
+  // });
 
-  var currentRoom = rooms[window.currentRoom];
-  if (currentRoom) {
+  // var currentRoom = rooms[window.currentRoom];
+  // if (currentRoom) {
+  //   $('.chatList').html('');
+  //   for (var i = 0; i < window.pageSize; i++) {
+  //     var datum = currentRoom[i];
+  //     var username = $("<span class='username'></span>");
+  //     username.text((datum ? datum.username + ": " : ""));
+  //     var msgtext = $("<span class='msgtext'></span>");
+  //     msgtext.text((datum ? datum.text : ""));
+  //     var newMsg = $("<li class='msg'></li>");
+  //     var UN = username.text().slice(0, username.text().length - 2);
+  //     if (window.friends[UN]) {
+  //       newMsg.addClass("friendMessage");
+  //     }
+  //     newMsg.append(username);
+  //     newMsg.append(msgtext);
+  //     if (!window.blocked[UN]) { $('.chatList').append(newMsg); }
+  //   }
+  // } else {
+  //   $('.chatList').html("<i>No messages here yet.</i>");
+  // }
+
     $('.chatList').html('');
-    for (var i = 0; i < window.pageSize; i++) {
-      var datum = currentRoom[i];
-      var username = $("<span class='username'></span>");
-      username.text((datum ? datum.username + ": " : ""));
-      var msgtext = $("<span class='msgtext'></span>");
-      msgtext.text((datum ? datum.text : ""));
-      var newMsg = $("<li class='msg'></li>");
-      var UN = username.text().slice(0, username.text().length - 2);
-      if (window.friends[UN]) {
-        newMsg.addClass("friendMessage");
+    for (var i=0; i < window.pageSize; i++) {
+      var datum = data[i];
+      if (datum) {
+        var username = $("<span class='username'></span>");
+        username.text((datum ? datum.username + ": " : ""));
+        var msgtext = $("<span class='msgtext'></span>");
+        msgtext.text((datum ? datum.text : ""));
+        var newMsg = $("<li class='msg'></li>");
+        if (window.friends[datum.username]) {
+          newMsg.addClass("friendMessage");
+        }
+        newMsg.append(username);
+        newMsg.append(msgtext);
+        if (!window.blocked[datum.username]) { $('.chatList').append(newMsg); }
       }
-      newMsg.append(username);
-      newMsg.append(msgtext);
-      if (!window.blocked[UN]) { $('.chatList').prepend(newMsg); }
     }
-  } else {
-    $('.chatList').html("<i>No messages here yet.</i>");
-  }
+
+
 
   $('.currentRoom').text(window.currentRoom);
   var sortedRooms =  _(window.rooms).sortBy(function (room) {
@@ -159,7 +180,7 @@ $(document).on("ready", function() {
         var message = {
           username: window.username,
           text: $(this).val(),
-          roomname: window.currentRoom
+          room: window.currentRoom
         };
         sendData(message);
         $(this).val('');

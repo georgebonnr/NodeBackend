@@ -9,7 +9,6 @@ var storage = require("./storage");
 var querystring = require('querystring');
 
 var handleRequest = function(request, response) {
-  console.log(request.method);
   var statusCode;
   var headers = defaultCorsHeaders;
   var responseBody = "Not Found";
@@ -20,7 +19,6 @@ var handleRequest = function(request, response) {
   headers['Content-Type'] = "text/plain";
   var pathname = url.parse(request.url).pathname;
 
-  console.log(pathname);
   if (!urls[pathname]) {
     statusCode = 404;
   }
@@ -38,23 +36,37 @@ var handleRequest = function(request, response) {
       // parse the received body data
       // var decodedBody = querystring.parse(fullBody);
       var decodedBody = JSON.parse(fullBody);
-      console.log(decodedBody);
       // output the decoded data to the HTTP response
       storage.set(decodedBody);
       responseBody = "OK";
     });
 
   } else if (request.method === 'GET') {
-    console.log(request.method);
     statusCode = 200;
-    var messages = storage.get();
+    var options = parseQueryString(request.url);
+    var messages = storage.get(options);
     responseBody = JSON.stringify(messages);
-    // console.log("Request for " + pathname + " received.");
     headers['Content-Type'] = "application/json";
   }
 
   response.writeHead(statusCode, headers);
   response.end(responseBody);
+};
+
+var parseQueryString = function(url){
+  var options = {};
+  var queryString = url.slice(url.indexOf('?')+1);
+  if (queryString === url) {
+    return options;
+  }
+  var pairs = queryString.split('&');
+  for (var i=0; i<pairs.length; i++) {
+    var pair = pairs[i].split('=');
+    options[pair[0]] = pair[1];
+  }
+  console.log(url);
+  console.log(options);
+  return options;
 };
 
 var defaultCorsHeaders = {
