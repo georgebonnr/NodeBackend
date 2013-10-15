@@ -6,16 +6,50 @@
 
 var url = require("url");
 var storage = require("./storage");
+var querystring = require('querystring');
 
 var handleRequest = function(request, response) {
   console.log(request.method);
-  var statusCode = 200;
-  var pathname = url.parse(request.url).pathname;
-  var headers = defaultCorsHeaders;
-  console.log("Request for " + pathname + " received.");
-  headers['Content-Type'] = "text/plain";
-  response.writeHead(statusCode, headers);
-  response.end('hi there!');
+
+
+  if (request.method === 'POST') {
+    var fullBody = '';
+    request.on('data', function(chunk) {
+      // append the current chunk of data to the fullBody variable
+      // fullBody += chunk.toString(); // `toString` is unnecessary due to use of `+=`
+      fullBody += chunk;
+    });
+
+    request.on('end', function() {
+      // request ended -> do something with the data
+      var statusCode = 200;
+      var headers = defaultCorsHeaders;
+      headers['Content-Type'] = "text/plain";
+      response.writeHead(statusCode, headers);
+
+      // parse the received body data
+      // var decodedBody = querystring.parse(fullBody);
+      var decodedBody = JSON.parse(fullBody);
+      console.log(decodedBody);
+      // output the decoded data to the HTTP response
+      storage.set(decodedBody);
+      response.end('OK');
+    });
+
+
+  } else if (request.method === 'GET') {
+    console.log(request.method);
+
+    var statusCode = 200;
+    // var pathname = url.parse(request.url).pathname;
+    var messages = storage.get();
+    var responseBody = JSON.stringify(messages);
+    var headers = defaultCorsHeaders;
+    // console.log("Request for " + pathname + " received.");
+    headers['Content-Type'] = "application/json";
+    response.writeHead(statusCode, headers);
+    response.end(responseBody);
+  }
 };
 
 var defaultCorsHeaders = {

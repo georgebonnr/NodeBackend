@@ -4,14 +4,14 @@ var getData =  function() {
   $.ajax({
     // always use this url
     url: 'http://127.0.0.1:8080/classes/chatterbox',
-    // dataType: 'json',
+    dataType: 'json',
     type: 'GET',
-    data: {
-      order: "-createdAt"
-    },
+    // data: {
+    //   order: "-createdAt"
+    // },
     success: function (data) {
       console.log(data);
-      render(data.results);
+      render(data);
     },
     error: function (data) {
       console.error('chatterbox: Failed to retrieve messages');
@@ -28,6 +28,7 @@ var render = function (data) {
     } else {
       window.rooms[datum.roomname].push(datum);
     }
+    $('body').append(datum.text);
   });
 
   var currentRoom = rooms[window.currentRoom];
@@ -87,6 +88,7 @@ var sendData = function(data) {
     }
   });
 };
+
 
 $(document).on("ready", function() {
 
