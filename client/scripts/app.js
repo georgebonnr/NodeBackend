@@ -28,7 +28,6 @@ var render = function (data) {
     } else {
       window.rooms[datum.roomname].push(datum);
     }
-    $('body').append(datum.text);
   });
 
   var currentRoom = rooms[window.currentRoom];
@@ -76,7 +75,7 @@ var render = function (data) {
 var sendData = function(data) {
   data = JSON.stringify(data);
   $.ajax({
-    url: 'http://127.0.0.1:8080',
+    url: 'http://127.0.0.1:8080/classes/chatterbox',
     // dataType: 'json',
     type: 'POST',
     data: data,

@@ -1,4 +1,6 @@
 var handler = require("../request-handler");
+// note for Jeff: I changed every instance of handler.handleRequest() to handler()
+// to reflect our module export pattern.
 
 function StubRequest(url, method, postdata) {
   this.url = url;
@@ -42,7 +44,7 @@ describe("Node Server Request Listener Function", function() {
                              "GET");
    var res = new StubResponse();
 
-   handler.handleRequest(req, res);
+   handler(req, res);
 
    expect(res._responseCode).toEqual(200);
    expect(res._data).toEqual("[]");
@@ -56,7 +58,7 @@ describe("Node Server Request Listener Function", function() {
                              message: "Do my bidding!"});
    var res = new StubResponse();
 
-   handler.handleRequest(req, res);
+   handler(req, res);
 
    // Expect 201 Created response status
    expect(res._responseCode).toEqual(201);
@@ -72,7 +74,7 @@ describe("Node Server Request Listener Function", function() {
                              "GET");
    res = new StubResponse();
 
-   handler.handleRequest(req, res);
+   handler(req, res);
 
    expect(res._responseCode).toEqual(200);
    var messageLog = JSON.parse(res._data);
@@ -88,7 +90,7 @@ describe("Node Server Request Listener Function", function() {
                              "GET");
    var res = new StubResponse();
 
-   handler.handleRequest(req, res);
+   handler(req, res);
    console.log("Res is " + res);
 
    // Wait some time before checking results:

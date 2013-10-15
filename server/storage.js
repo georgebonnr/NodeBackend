@@ -1,14 +1,6 @@
 // storage.js
-var msg1 = {
-  username: "George",
-  text: "Hello"
-};
-var msg2 = {
-  username: "Greg",
-  text: "Yo"
-};
 
-var messages = [msg1, msg2];
+var messages = [];
 
 var get = function(options){
   if (options && options.order) {

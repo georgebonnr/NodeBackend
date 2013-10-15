@@ -10,10 +10,23 @@ var querystring = require('querystring');
 
 var handleRequest = function(request, response) {
   console.log(request.method);
+  var statusCode;
+  var headers = defaultCorsHeaders;
+  var responseBody = "Not Found";
+  var urls = {
+    '/classes/chatterbox': true,
+    '/classes/room1': true
+  };
+  headers['Content-Type'] = "text/plain";
+  var pathname = url.parse(request.url).pathname;
 
-
-  if (request.method === 'POST') {
+  console.log(pathname);
+  if (!urls[pathname]) {
+    statusCode = 404;
+  }
+  else if (request.method === 'POST') {
     var fullBody = '';
+    statusCode = 201;
     request.on('data', function(chunk) {
       // append the current chunk of data to the fullBody variable
       // fullBody += chunk.toString(); // `toString` is unnecessary due to use of `+=`
@@ -22,34 +35,26 @@ var handleRequest = function(request, response) {
 
     request.on('end', function() {
       // request ended -> do something with the data
-      var statusCode = 200;
-      var headers = defaultCorsHeaders;
-      headers['Content-Type'] = "text/plain";
-      response.writeHead(statusCode, headers);
-
       // parse the received body data
       // var decodedBody = querystring.parse(fullBody);
       var decodedBody = JSON.parse(fullBody);
       console.log(decodedBody);
       // output the decoded data to the HTTP response
       storage.set(decodedBody);
-      response.end('OK');
+      responseBody = "OK";
     });
-
 
   } else if (request.method === 'GET') {
     console.log(request.method);
-
-    var statusCode = 200;
-    // var pathname = url.parse(request.url).pathname;
+    statusCode = 200;
     var messages = storage.get();
-    var responseBody = JSON.stringify(messages);
-    var headers = defaultCorsHeaders;
+    responseBody = JSON.stringify(messages);
     // console.log("Request for " + pathname + " received.");
     headers['Content-Type'] = "application/json";
-    response.writeHead(statusCode, headers);
-    response.end(responseBody);
   }
+
+  response.writeHead(statusCode, headers);
+  response.end(responseBody);
 };
 
 var defaultCorsHeaders = {
