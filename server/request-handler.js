@@ -7,8 +7,8 @@
 var url = require("url");
 var storage = require("./storage");
 var fs = require('fs');
+// unnecessary since we have our own implementation for now
 // var querystring = require('querystring');
-
 
 var handleRequest = function(request, response) {
   var statusCode = 404;
@@ -34,7 +34,6 @@ var handleRequest = function(request, response) {
 
   var serveFile = function(){
     statusCode = 200;
-    console.log('serving file!!!');
     if (pathname === '/' || pathname === '') {
       headers['Content-Type'] = "text/html";
       responseBody = fs.readFileSync('../client/index.html');
@@ -72,7 +71,7 @@ var handleRequest = function(request, response) {
     '/scripts/config.js': serveFile,
     '/scripts/app.js': serveFile
   };
-  
+
   var pathname = url.parse(request.url).pathname;
   // console.log(pathname);
   // console.log(router[pathname]);

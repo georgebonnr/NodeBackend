@@ -1,4 +1,5 @@
 // storage.js
+var fs = require('fs');
 
 var messages = {
   lobby: []
@@ -25,7 +26,9 @@ var get = function(options){
 var set = function(message){
   message.createdAt = new Date();
   messages[message.room] ? messages[message.room].push(message) : messages[message.room] = [message];
-  console.log('set ',messages[message.room]);
+  fs.appendFile("log.txt", JSON.stringify(message), function(err) {
+    if(err) { console.log(err); }
+  });
 };
 
 module.exports = {
