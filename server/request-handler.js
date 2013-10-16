@@ -1,7 +1,7 @@
 var url = require("url");
 var storage = require("./storage");
 var fs = require('fs');
-// we rolled our own query parser but could just require queryString module
+// we rolled our own basic query parser for this but in the future could just use queryString module
 
 var handleRequest = function(request, response) {
   var statusCode = 404;
@@ -52,12 +52,19 @@ var handleRequest = function(request, response) {
     }
   };
 
+  var getRooms = function(){
+    headers['Content-Type'] = "application/json";
+    statusCode = 200;
+    rooms = storage.getRooms();
+    responseBody = JSON.stringify(rooms);
+  };
+
   var router = {
     '/classes/chatterbox': storageAccess,
     '/classes/room1': storageAccess,
+    '/classes/getrooms': getRooms,
     '/': serveFile,
     '/styles/styles.css': serveFile,
-    '/scripts/config.js': serveFile,
     '/scripts/app.js': serveFile
   };
 
@@ -65,12 +72,13 @@ var handleRequest = function(request, response) {
   router[pathname]();
   response.writeHead(statusCode, headers);
   response.end(responseBody);
+};
+
   var defaultCorsHeaders = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
     "access-control-allow-headers": "content-type, accept",
     "access-control-max-age": 10
   };
-};
 
 module.exports = handleRequest;

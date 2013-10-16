@@ -1,22 +1,15 @@
 var fs = require('fs');
-
 var messages = {
   lobby: []
 };
 
 var get = function(options){
-  if (messages[options.room] === undefined) {
-    messages[options.room] = [];
-  }
+  if (messages[options.room] === undefined) { messages[options.room] = []; }
   var roomMessages = messages[options.room];
-  console.log(roomMessages);
   if (options.order) {
     return roomMessages.sort(function(a,b) {
-      if (options.order[0] === "-") {
-        return b[options.order.slice(1)] - a[options.order.slice(1)];
-      } else {
-        return a[options.order] - b[options.order];
-      }
+      if (options.order[0] === "-") { return b[options.order.slice(1)] - a[options.order.slice(1)]; }
+      return a[options.order] - b[options.order];
     });
   }
   return roomMessages;
@@ -30,7 +23,12 @@ var set = function(message){
   });
 };
 
+var getRooms = function() {
+  return Object.keys(messages);
+};
+
 module.exports = {
   "get": get,
-  "set": set
+  "set": set,
+  "getRooms": getRooms
 };
