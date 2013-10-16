@@ -6,68 +6,83 @@
 
 var url = require("url");
 var storage = require("./storage");
-var querystring = require('querystring');
+var fs = require('fs');
+// var querystring = require('querystring');
+
 
 var handleRequest = function(request, response) {
-  var statusCode;
+  var statusCode = 404;
   var headers = defaultCorsHeaders;
-  var responseBody = "Not Found";
-  var urls = {
-    '/classes/chatterbox': true,
-    '/classes/room1': true
-  };
   headers['Content-Type'] = "text/plain";
-  var pathname = url.parse(request.url).pathname;
+  var responseBody = "Not Found";
 
-  if (!urls[pathname]) {
-    statusCode = 404;
-  }
-  else if (request.method === 'POST') {
-    var fullBody = '';
-    statusCode = 201;
-    request.on('data', function(chunk) {
-      // append the current chunk of data to the fullBody variable
-      // fullBody += chunk.toString(); // `toString` is unnecessary due to use of `+=`
-      fullBody += chunk;
-    });
+  var parseQueryString = function(url){
+    var options = {};
+    var queryString = url.slice(url.indexOf('?')+1);
+    if (queryString === url) {
+      return options;
+    }
+    var pairs = queryString.split('&');
+    for (var i=0; i<pairs.length; i++) {
+      var pair = pairs[i].split('=');
+      options[pair[0]] = pair[1];
+    }
+    console.log(url);
+    console.log(options);
+    return options;
+  };
 
-    request.on('end', function() {
-      // request ended -> do something with the data
-      // parse the received body data
-      // var decodedBody = querystring.parse(fullBody);
-      var decodedBody = JSON.parse(fullBody);
-      // output the decoded data to the HTTP response
-      storage.set(decodedBody);
-      responseBody = "OK";
-    });
-
-  } else if (request.method === 'GET') {
+  var serveFile = function(){
     statusCode = 200;
-    var options = parseQueryString(request.url);
-    var messages = storage.get(options);
-    responseBody = JSON.stringify(messages);
-    headers['Content-Type'] = "application/json";
-  }
+    console.log('serving file!!!');
+    if (pathname === '/' || pathname === '') {
+      headers['Content-Type'] = "text/html";
+      responseBody = fs.readFileSync('../client/index.html');
+    } else {
+      headers['Content-Type'] = (pathname === '/styles/styles.css') ? "text/css" : "text/javascript";
+      responseBody = fs.readFileSync('../client/' + pathname);
+    }
+  };
+
+  var storageAccess = function(){
+    if (request.method === 'POST') {
+      var fullBody = '';
+      statusCode = 201;
+      request.on('data', function(chunk) {
+        fullBody += chunk;
+      });
+      request.on('end', function() {
+        storage.set(JSON.parse(fullBody));
+        responseBody = "OK";
+      });
+    } else if (request.method === 'GET') {
+      headers['Content-Type'] = "application/json";
+      statusCode = 200;
+      var options = parseQueryString(request.url);
+      var messages = storage.get(options);
+      responseBody = JSON.stringify(messages);
+    }
+  };
+
+  var router = {
+    '/classes/chatterbox': storageAccess,
+    '/classes/room1': storageAccess,
+    '/': serveFile,
+    '/styles/styles.css': serveFile,
+    '/scripts/config.js': serveFile,
+    '/scripts/app.js': serveFile
+  };
+  
+  var pathname = url.parse(request.url).pathname;
+  // console.log(pathname);
+  // console.log(router[pathname]);
+  router[pathname]();
 
   response.writeHead(statusCode, headers);
   response.end(responseBody);
 };
 
-var parseQueryString = function(url){
-  var options = {};
-  var queryString = url.slice(url.indexOf('?')+1);
-  if (queryString === url) {
-    return options;
-  }
-  var pairs = queryString.split('&');
-  for (var i=0; i<pairs.length; i++) {
-    var pair = pairs[i].split('=');
-    options[pair[0]] = pair[1];
-  }
-  console.log(url);
-  console.log(options);
-  return options;
-};
+
 
 var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
@@ -77,35 +92,3 @@ var defaultCorsHeaders = {
 };
 
 module.exports = handleRequest;
-
-// var requestListener = function (request, response) {
-
-//   /* Request is an http.ServerRequest object containing various data
-//    * about the client request - such as what URL the browser is
-//    * requesting. */
-//   console.log("Serving request type " + request.method + " for url " + request.url);
-
-//   /* "Status code" and "headers" are HTTP concepts that you can
-//    * research on the web as and when it becomes necessary. */
-//   var statusCode = 200;
-
-//   /* Without this line, this server wouldn't work.  See the note
-//    * below about CORS. */
-//   var headers = defaultCorsHeaders;
-
-//   headers['Content-Type'] = "text/plain";
-
-//    Response is an http.ServerRespone object containing methods for
-//    * writing our response to the client. Documentation for both request
-//    * and response can be found at
-//    * http://nodemanual.org/0.8.14/nodejs_ref_guide/http.html
-//   response.writeHead(statusCode, headers);
-//   /* .writeHead() tells our server what HTTP status code to send back
-//    * to the client, and what headers to include on the response. */
-
-//   /* Make sure to always call response.end() - Node will not send
-//    * anything back to the client until you do. The string you pass to
-//    * response.end() will be the body of the response - i.e. what shows
-//    * up in the browser.*/
-//   response.end("Hello, World!");
-// };
