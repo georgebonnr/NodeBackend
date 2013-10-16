@@ -1,4 +1,3 @@
-// storage.js
 var fs = require('fs');
 
 var messages = {

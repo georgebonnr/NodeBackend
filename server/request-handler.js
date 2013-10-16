@@ -1,14 +1,7 @@
-/* You should implement your request handler function in this file.
- * But you need to pass the function to http.createServer() in
- * basic-server.js.  So you must figure out how to export the function
- * from this file and include it in basic-server.js. Check out the
- * node module documentation at http://nodejs.org/api/modules.html. */
-
 var url = require("url");
 var storage = require("./storage");
 var fs = require('fs');
-// unnecessary since we have our own implementation for now
-// var querystring = require('querystring');
+// we rolled our own query parser but could just require queryString module
 
 var handleRequest = function(request, response) {
   var statusCode = 404;
@@ -19,22 +12,18 @@ var handleRequest = function(request, response) {
   var parseQueryString = function(url){
     var options = {};
     var queryString = url.slice(url.indexOf('?')+1);
-    if (queryString === url) {
-      return options;
-    }
+    if (queryString === url) { return options; }
     var pairs = queryString.split('&');
     for (var i=0; i<pairs.length; i++) {
       var pair = pairs[i].split('=');
       options[pair[0]] = pair[1];
     }
-    console.log(url);
-    console.log(options);
     return options;
   };
 
   var serveFile = function(){
     statusCode = 200;
-    if (pathname === '/' || pathname === '') {
+    if (pathname === '/') {
       headers['Content-Type'] = "text/html";
       responseBody = fs.readFileSync('../client/index.html');
     } else {
@@ -45,13 +34,13 @@ var handleRequest = function(request, response) {
 
   var storageAccess = function(){
     if (request.method === 'POST') {
-      var fullBody = '';
+      var data = '';
       statusCode = 201;
       request.on('data', function(chunk) {
-        fullBody += chunk;
+        data += chunk;
       });
       request.on('end', function() {
-        storage.set(JSON.parse(fullBody));
+        storage.set(JSON.parse(data));
         responseBody = "OK";
       });
     } else if (request.method === 'GET') {
@@ -73,21 +62,15 @@ var handleRequest = function(request, response) {
   };
 
   var pathname = url.parse(request.url).pathname;
-  // console.log(pathname);
-  // console.log(router[pathname]);
   router[pathname]();
-
   response.writeHead(statusCode, headers);
   response.end(responseBody);
-};
-
-
-
-var defaultCorsHeaders = {
-  "access-control-allow-origin": "*",
-  "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
+  var defaultCorsHeaders = {
+    "access-control-allow-origin": "*",
+    "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "access-control-allow-headers": "content-type, accept",
+    "access-control-max-age": 10
+  };
 };
 
 module.exports = handleRequest;
