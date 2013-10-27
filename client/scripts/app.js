@@ -16,6 +16,21 @@ var getData =  function() {
   });
 };
 
+var sendData = function(data) {
+  data = JSON.stringify(data);
+  $.ajax({
+    url: 'http://127.0.0.1:8080/classes/chatterbox',
+    type: 'POST',
+    data: data,
+    success: function (data) {
+      console.log('Message sent');
+    },
+    error: function (data) {
+      console.error('Failed to send message ' + data);
+    }
+  });
+};
+
 var render = function (data) {
     $('.chatList').html('');
     for (var i=0; i < window.pageSize; i++) {
@@ -51,21 +66,6 @@ var render = function (data) {
     $('.roomList').append(room);
   }
   setTimeout(getData,2000);
-};
-
-var sendData = function(data) {
-  data = JSON.stringify(data);
-  $.ajax({
-    url: 'http://127.0.0.1:8080/classes/chatterbox',
-    type: 'POST',
-    data: data,
-    success: function (data) {
-      console.log('Message sent');
-    },
-    error: function (data) {
-      console.error('Failed to send message ' + data);
-    }
-  });
 };
 
 $(document).on("ready", function() {
