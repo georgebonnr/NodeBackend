@@ -1,58 +1,22 @@
-// Helper functions:
-
 var getData =  function() {
   $.ajax({
-    // always use this url
     url: 'http://127.0.0.1:8080/classes/chatterbox',
     dataType: 'json',
     type: 'GET',
     data: {
       order: "-createdAt",
-      room: window.currentRoom
+      room: currentRoom
     },
     success: function (data) {
-      console.log(data);
       render(data);
     },
     error: function (data) {
-      console.error('chatterbox: Failed to retrieve messages');
+      console.error('Failed to retrieve messages');
     }
   });
 };
 
 var render = function (data) {
-  // console.log(data)
-  // window.rooms = {};
-  // _(data).each(function (datum) {
-  //   if (rooms[datum.roomname] === undefined) {
-  //     window.rooms[datum.roomname] = [datum];
-  //   } else {
-  //     window.rooms[datum.roomname].push(datum);
-  //   }
-  // });
-
-  // var currentRoom = rooms[window.currentRoom];
-  // if (currentRoom) {
-  //   $('.chatList').html('');
-  //   for (var i = 0; i < window.pageSize; i++) {
-  //     var datum = currentRoom[i];
-  //     var username = $("<span class='username'></span>");
-  //     username.text((datum ? datum.username + ": " : ""));
-  //     var msgtext = $("<span class='msgtext'></span>");
-  //     msgtext.text((datum ? datum.text : ""));
-  //     var newMsg = $("<li class='msg'></li>");
-  //     var UN = username.text().slice(0, username.text().length - 2);
-  //     if (window.friends[UN]) {
-  //       newMsg.addClass("friendMessage");
-  //     }
-  //     newMsg.append(username);
-  //     newMsg.append(msgtext);
-  //     if (!window.blocked[UN]) { $('.chatList').append(newMsg); }
-  //   }
-  // } else {
-  //   $('.chatList').html("<i>No messages here yet.</i>");
-  // }
-
     $('.chatList').html('');
     for (var i=0; i < window.pageSize; i++) {
       var datum = data[i];
@@ -71,8 +35,6 @@ var render = function (data) {
       }
     }
 
-
-
   $('.currentRoom').text(window.currentRoom);
   var sortedRooms =  _(window.rooms).sortBy(function (room) {
     return room.length;
@@ -81,15 +43,13 @@ var render = function (data) {
   for (var j = 0; j < sortedRooms.length; j++) {
     var room = $("<li class='room'></li>");
     var roomName = sortedRooms[j][0].roomname;
-    $(room).attr("name", roomName); // Add the real name as a class.
-    if (roomName && roomName.length > 18) { // Trim the real name for display.
+    $(room).attr("name", roomName);
+    if (roomName && roomName.length > 18) {
       roomName = roomName.slice(0,18) + "...";
     }
     room.text(roomName);
     $('.roomList').append(room);
   }
-
-
   setTimeout(getData,2000);
 };
 
@@ -97,29 +57,23 @@ var sendData = function(data) {
   data = JSON.stringify(data);
   $.ajax({
     url: 'http://127.0.0.1:8080/classes/chatterbox',
-    // dataType: 'json',
     type: 'POST',
     data: data,
     success: function (data) {
-      console.log('chatterbox: Message sent');
+      console.log('Message sent');
     },
     error: function (data) {
-      console.error('chatterbox: Failed to send message ' + data);
+      console.error('Failed to send message ' + data);
     }
   });
 };
 
-
 $(document).on("ready", function() {
-
-  // Global variables.
   window.pageSize = 15;
   window.roomListSize = 5;
   window.currentRoom = "lobby";
   window.friends = {};
   window.blocked = {};
-
-  // Assign all parameters in the URL to global variables.
   var query = window.location.search.substring(1);
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
@@ -127,8 +81,6 @@ $(document).on("ready", function() {
     window[vars[i][0]] = vars[i][1];
   }
 
-
-  // JQuery bindings.
   $(document).on('click', '.room', function() {
     window.currentRoom = $(this).attr('name');
   });
