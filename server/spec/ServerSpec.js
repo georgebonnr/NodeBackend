@@ -1,6 +1,4 @@
 var handler = require("../request-handler");
-// note for Jeff: I changed every instance of handler.handleRequest() to handler()
-// to reflect our module export pattern.
 
 function StubRequest(url, method, postdata) {
   this.url = url;
@@ -59,23 +57,12 @@ describe("Node Server Request Listener Function", function() {
    var res = new StubResponse();
 
    handler(req, res);
-
-   // Expect 201 Created response status
    expect(res._responseCode).toEqual(201);
-
-   // Testing for a newline isn't a valid test
-   // TODO: Replace with with a valid test
-   // expect(res._data).toEqual(JSON.stringify("\n"));
    expect(res._ended).toEqual(true);
-
-   // Now if we request the log for that room,
-   // the message we posted should be there:
    req = new StubRequest("http://127.0.0.1:8080/classes/room1",
                              "GET");
    res = new StubResponse();
-
    handler(req, res);
-
    expect(res._responseCode).toEqual(200);
    var messageLog = JSON.parse(res._data);
    expect(messageLog.length).toEqual(1);
@@ -92,10 +79,7 @@ describe("Node Server Request Listener Function", function() {
 
    handler(req, res);
    console.log("Res is " + res);
-
-   // Wait some time before checking results:
    waits(1000);
-
    runs(function() {
      expect(res._responseCode).toEqual(404);
      expect(res._ended).toEqual(true);
