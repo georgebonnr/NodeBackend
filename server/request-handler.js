@@ -17,7 +17,7 @@ var handleRequest = function(request, response) {
     var pairs = queryString.split('&');
     for (var i=0; i<pairs.length; i++) {
       var pair = pairs[i].split('=');
-      options[pair[0]] = pair[1];
+      options[pair[0]] = (pair[1]).replace("+",' ');
     }
     return options;
   };
