@@ -17,11 +17,8 @@ var get = function(options){
 
 var set = function(message){
   message.createdAt = new Date();
-  console.log(message.room)
   messages[message.room] ? messages[message.room].push(message) : messages[message.room] = [message];
-  fs.appendFile("log.txt", JSON.stringify(message), function(err) {
-    if(err) { console.log(err); }
-  });
+  fs.appendFile("log.txt", JSON.stringify(message));
 };
 
 var getRooms = function() {

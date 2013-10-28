@@ -1,5 +1,4 @@
 var getData =  function() {
-  console.log(settings.currentRoom)
   $.ajax({
     url: 'http://127.0.0.1:8080/messages',
     dataType: 'json',
