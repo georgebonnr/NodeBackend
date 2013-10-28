@@ -29,14 +29,12 @@ var handleRequest = function(request, response) {
       responseBody = fs.readFileSync('../client/index.html');
     } else {
       headers['Content-Type'] = (pathname === '/styles/styles.css') ? "text/css" : "text/javascript";
-      console.log(pathname);
       responseBody = fs.readFileSync(path.join('../client',pathname));
     }
   };
 
   var storageAccess = function(){
     if (request.method === 'POST') {
-      console.log();
       var data = '';
       statusCode = 201;
       request.on('data', function(chunk) {
