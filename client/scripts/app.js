@@ -56,7 +56,7 @@ var renderRooms = function(data) {
 var settings = {
   username: "me", // you can set this through a prompt, address bar query parsing, or more formal authentication
   currentRoom: "lobby"
-}
+};
 
 $(document).on("ready", function() {
   $('.messageInput').keyup(function(e){
