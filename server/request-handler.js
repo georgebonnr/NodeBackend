@@ -1,6 +1,7 @@
 var url = require("url");
 var storage = require("./storage");
 var fs = require('fs');
+var path = require('path');
 // we rolled our own basic query parser for this but in the future could just use queryString module
 
 var handleRequest = function(request, response) {
@@ -28,12 +29,14 @@ var handleRequest = function(request, response) {
       responseBody = fs.readFileSync('../client/index.html');
     } else {
       headers['Content-Type'] = (pathname === '/styles/styles.css') ? "text/css" : "text/javascript";
-      responseBody = fs.readFileSync('../client/' + pathname);
+      console.log(pathname);
+      responseBody = fs.readFileSync(path.join('../client',pathname));
     }
   };
 
   var storageAccess = function(){
     if (request.method === 'POST') {
+      console.log();
       var data = '';
       statusCode = 201;
       request.on('data', function(chunk) {
@@ -60,16 +63,16 @@ var handleRequest = function(request, response) {
   };
 
   var router = {
-    '/classes/chatterbox': storageAccess,
-    '/classes/room1': storageAccess,
-    '/classes/getrooms': getRooms,
+    '/messages': storageAccess,
+    '/getrooms': getRooms,
     '/': serveFile,
     '/styles/styles.css': serveFile,
-    '/scripts/app.js': serveFile
+    '/scripts/app.js': serveFile,
+    '/scripts/config.js': serveFile
   };
 
   var pathname = url.parse(request.url).pathname;
-  router[pathname]();
+  if (router[pathname]) {router[pathname]();}
   response.writeHead(statusCode, headers);
   response.end(responseBody);
 };
