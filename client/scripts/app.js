@@ -8,6 +8,7 @@ var getData =  function() {
       room: settings.currentRoom // property that we set with jQuery
     },
     success: function (data) {
+      console.log(data);
       render(data);
     },
     error: function (data) {
@@ -52,11 +53,28 @@ var renderRooms = function(data) {
   // show list of available rooms
 };
 
-$(document).on("ready", function() {
+var settings = {
+  username: "me", // you can set this through a prompt, address bar query parsing, or more formal authentication
+  currentRoom: "lobby"
+}
 
-  // Client-side logic goes here!
+$(document).on("ready", function() {
+  $('.messageInput').keyup(function(e){
+    if(e.keyCode == 13) {
+      if ($(this).val()) {
+        var message = {
+          username: settings.username,
+          text: $(this).val(),
+          room: settings.currentRoom
+        };
+        sendData(message);
+        $(this).val('');
+      }
+    }
+  });
 
   // Page initialization.
   getRooms();
+  // getRooms is not 
   getData();
 });
